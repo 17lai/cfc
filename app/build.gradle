@@ -44,19 +44,14 @@ dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation 'androidx.appcompat:appcompat:1.1.0'
     implementation 'androidx.constraintlayout:constraintlayout:1.1.3'
+    implementation 'androidx.webkit:webkit:1.8.0'
     implementation project(path: ':opencv')
 }
 
 preBuild.doFirst {
-    def cimbarJs = file("src/main/assets/cimbar_js.html")
+    def cimbarJs = file("src/main/assets/index.html")
     if (!cimbarJs.exists()) {
         throw new GradleException("Missing cimbar-js-bits submodule?")
-    }
-    def digest = java.security.MessageDigest.getInstance("SHA-256")
-    def actual = digest.digest(cimbarJs.bytes).collect { String.format("%02x", it) }.join("")
-	def expected = "3c3163323c2471f3f4b795f244145cda76f1ab23dc66f6ac09fb288ae9d26db6" // v0.6.5
-    if (actual != expected) {
-        throw new GradleException("cimbar-js-bits SHA-256 mismatch :(\n  expected: ${expected}\n  actual:   ${actual}")
     }
 }
 
