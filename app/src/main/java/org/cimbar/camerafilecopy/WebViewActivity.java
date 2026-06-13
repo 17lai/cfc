@@ -75,7 +75,7 @@ public class WebViewActivity extends Activity {
             }
         });
 
-        webView.loadUrl("https://appassets.androidplatform.net/assets/index.html");
+        webView.loadUrl("https://appassets.androidplatform.net/assets/index.html#ww=1");
 
         // Set up the swipe gestures
         mDetector = new GestureDetectorCompat(this, new FlingGestureDetector());
