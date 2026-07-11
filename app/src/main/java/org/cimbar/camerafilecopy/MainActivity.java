@@ -15,6 +15,7 @@ import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.SurfaceView;
 import android.view.WindowManager;
+import android.webkit.MimeTypeMap;
 import android.widget.CompoundButton;
 import android.widget.Toast;
 import androidx.annotation.Nullable;
@@ -176,7 +177,7 @@ public class MainActivity extends CameraActivity implements CvCameraViewListener
         else if (!res.isEmpty()) {
             Intent intent = new Intent(Intent.ACTION_CREATE_DOCUMENT);
             intent.addCategory(Intent.CATEGORY_OPENABLE);
-            intent.setType("application/octet-stream");
+            intent.setType(getMimeType(res));
             intent.putExtra(Intent.EXTRA_TITLE, res);
             // can't get putExtra to work for extra values, so we'll save it in the class
             this.activePath = this.dataPath + "/" + res;
@@ -185,6 +186,22 @@ public class MainActivity extends CameraActivity implements CvCameraViewListener
 
         // return processed frame for live preview
         return mat;
+    }
+
+    // mimetype helper
+    protected static String getMimeType(String filename) {
+        String mt = null;
+        int extIdx = filename.lastIndexOf('.');
+        if (extIdx >= 0) {
+            String ext = filename.substring(extIdx + 1).toLowerCase();
+            if (!ext.isEmpty()) {
+                mt = MimeTypeMap.getSingleton().getMimeTypeFromExtension(ext);
+            }
+        }
+        if (mt == null) {
+            mt = "*/*";
+        }
+        return mt;
     }
 
     @Override
