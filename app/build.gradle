@@ -49,9 +49,16 @@ dependencies {
 }
 
 preBuild.doFirst {
-    def cimbarJs = file("src/main/assets/index.html")
-    if (!cimbarJs.exists()) {
-        throw new GradleException("Missing cimbar-js-bits submodule?")
+    def indexHtml = file("src/main/assets/index.html")
+    if (!indexHtml.exists()) {
+        throw new GradleException("Missing cimbar-js-bits submodule? (index.html)")
+    }
+    def cimbarJs = fileTree("src/main/assets").include("cimbar_js.*.wasm").singleFile
+    def digest = java.security.MessageDigest.getInstance("SHA-256")
+    def actual = digest.digest(cimbarJs.bytes).collect { String.format("%02x", it) }.join("")
+	def expected = "4b10483127d403ea3873ee751454afdc5d42eb5818f8b02e4c2ed0d49e2072ec" // v0.6.7
+    if (actual != expected) {
+        throw new GradleException("cimbar-js-bits SHA-256 mismatch :(\n  expected: ${expected}\n  actual:   ${actual}")
     }
 }
 
