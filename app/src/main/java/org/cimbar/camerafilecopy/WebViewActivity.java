@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.ActivityNotFoundException;
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
@@ -13,10 +14,14 @@ import android.view.View;
 import android.view.WindowManager;
 import android.webkit.ValueCallback;
 import android.webkit.WebChromeClient;
+import android.webkit.WebResourceRequest;
+import android.webkit.WebResourceResponse;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
+import android.webkit.WebViewClient;
 
 import androidx.core.view.GestureDetectorCompat;
+import androidx.webkit.WebViewAssetLoader;
 
 
 public class WebViewActivity extends Activity {
@@ -40,8 +45,17 @@ public class WebViewActivity extends Activity {
         webView = findViewById(R.id.web_view);
         webViewSettings = webView.getSettings();
         webViewSettings.setJavaScriptEnabled(true);
-        webViewSettings.setAllowFileAccess(true);
-        webViewSettings.setAllowFileAccessFromFileURLs(true);
+
+        final WebViewAssetLoader assetLoader = new WebViewAssetLoader.Builder()
+                .addPathHandler("/assets/", new WebViewAssetLoader.AssetsPathHandler(this))
+                .build();
+
+        webView.setWebViewClient(new WebViewClient() {
+            @Override
+            public WebResourceResponse shouldInterceptRequest(WebView view, WebResourceRequest request) {
+                return assetLoader.shouldInterceptRequest(request.getUrl());
+            }
+        });
 
         webView.setWebChromeClient(new WebChromeClient() {
             @Override
@@ -61,7 +75,7 @@ public class WebViewActivity extends Activity {
             }
         });
 
-        webView.loadUrl("file:///android_asset/cimbar_js.html");
+        webView.loadUrl("https://appassets.androidplatform.net/assets/index.html#ww=1");
 
         // Set up the swipe gestures
         mDetector = new GestureDetectorCompat(this, new FlingGestureDetector());
@@ -77,6 +91,13 @@ public class WebViewActivity extends Activity {
     @Override
     public void onStart() {
         super.onStart();
+    }
+
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        getWindow().getDecorView().requestLayout();
+        overridePendingTransition(0, 0);
     }
 
     @Override
@@ -117,5 +138,4 @@ public class WebViewActivity extends Activity {
             return true;
         }
     }
-
 }
